@@ -3,7 +3,7 @@ import AnalyticsClient from '@/components/analytics/AnalyticsClient'
 import { format, subDays } from 'date-fns'
 
 export default async function AnalyticsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
