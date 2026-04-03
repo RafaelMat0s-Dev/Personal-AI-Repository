@@ -34,9 +34,16 @@ function TaskCard({ task, onDelete }: { task: Task; onDelete: (id: string) => vo
   return (
     <div
       ref={setNodeRef}
-      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
-      className="group p-3.5 rounded-xl border transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-default"
-      style_={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}
+      {...attributes}
+      {...listeners}
+      className="group p-3.5 rounded-xl border transition-all hover:-translate-y-0.5 hover:shadow-lg"
+      style={{ 
+        transform: CSS.Transform.toString(transform), 
+        transition, 
+        opacity: isDragging ? 0.5 : 1,
+        background: 'var(--surface2)', 
+        borderColor: 'var(--border)' 
+      }}
     >
       <div className="p-3.5 rounded-xl border transition-all hover:-translate-y-0.5 hover:shadow-lg"
         style={{ background: 'var(--surface2)', borderColor: 'var(--border)' }}>
