@@ -29,7 +29,7 @@ interface CalendarBlock {
 interface Task { id: string; text: string; column_id: string }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
-const HOUR_HEIGHT = 60 // px per hour
+const HOUR_HEIGHT = 40 // px per hour — 30min slots = 20px
 
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(':').map(Number)
@@ -54,13 +54,17 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
   const [events, setEvents] = useState<CalendarEvent[]>(initialEvents)
   const [eventModal, setEventModal] = useState(false)
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)
-  const [eventForm, setEventForm] = useState({ title: '', description: '', time: '', type: 'event' as CalendarEvent['type'] })
+  const [eventForm, setEventForm] = useState({ title: '', description: '', time: '', type: 'event' as CalendarEvent['type'], recurrence: 'none' as 'none' | 'daily' | 'weekdays' })
 
   // Blocks
   const [blocks, setBlocks] = useState<CalendarBlock[]>([])
   const [blocksLoaded, setBlocksLoaded] = useState(false)
   const [blockModal, setBlockModal] = useState(false)
   const [editingBlock, setEditingBlock] = useState<CalendarBlock | null>(null)
+  const [lastUsedColor, setLastUsedColor] = useState<string>(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('cal_last_color') || '#7b6cfa'
+    return '#7b6cfa'
+  })
   const [blockForm, setBlockForm] = useState({ name: '', color: '#7b6cfa', start_time: '09:00', end_time: '10:00', task_ids: [] as string[] })
   const [tasks, setTasks] = useState<Task[]>([])
   const [tasksLoaded, setTasksLoaded] = useState(false)
@@ -195,7 +199,7 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
       if (draggedMinutes < 15) return
       const startTime = minutesToTime(savedStart.minutes)
       const endTime   = minutesToTime(Math.max(savedStart.minutes + 15, savedEnd))
-      setBlockForm({ name: '', color: '#7b6cfa', start_time: startTime, end_time: endTime, task_ids: [] })
+      setBlockForm({ name: '', color: lastUsedColor, start_time: startTime, end_time: endTime, task_ids: [] })
       setEditingBlock(null)
       setBlockModal(true)
       loadTasks()
@@ -215,7 +219,7 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
     const mins = getMinutesFromY(e.clientY)
     setDragging(true)
     setDragStart({ y: e.clientY, minutes: mins })
-    setDragEnd(mins + 60)
+    setDragEnd(mins + 30)
     setDragDate(dateStr)
   }
 
@@ -237,6 +241,8 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
       await supabase.from('calendar_blocks').insert(block)
       toast.success('Block created!')
     }
+    setLastUsedColor(blockForm.color)
+    localStorage.setItem('cal_last_color', blockForm.color)
     setBlockModal(false); setEditingBlock(null)
   }
 
@@ -255,13 +261,14 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
       description: ev.description || '',
       time: ev.time || '',
       type: ev.type,
+      recurrence: (ev as CalendarEvent & { recurrence?: string }).recurrence as 'none' | 'daily' | 'weekdays' || 'none',
     })
     setEventModal(true)
   }
 
   function openNewEvent() {
     setEditingEvent(null)
-    setEventForm({ title: '', description: '', time: '', type: 'event' })
+    setEventForm({ title: '', description: '', time: '', type: 'event', recurrence: 'none' })
     setEventModal(true)
   }
 
@@ -298,7 +305,7 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
       }
       setEvents(prev => [...prev, event])
       setEventModal(false)
-      setEventForm({ title: '', description: '', time: '', type: 'event' })
+      setEventForm({ title: '', description: '', time: '', type: 'event', recurrence: 'none' })
       await supabase.from('events').insert(event)
       toast.success('Event added!')
     }
@@ -449,6 +456,12 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
                 <span className="text-[9px]" style={{ color: 'var(--text-dim)' }}>{String(h).padStart(2, '0')}:00</span>
               </div>
             ))}
+            {HOURS.map(h => (
+              <div key={`${h}-30`} className="absolute w-full flex items-start justify-end pr-2 pt-0.5"
+                style={{ top: h * HOUR_HEIGHT + HOUR_HEIGHT / 2, height: HOUR_HEIGHT / 2 }}>
+                <span className="text-[8px]" style={{ color: 'var(--text-dim)', opacity: 0.5 }}>{String(h).padStart(2, '0')}:30</span>
+              </div>
+            ))}
           </div>
 
           {dates.map(day => {
@@ -463,10 +476,16 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
                 onMouseDown={e => onGridMouseDown(e, dateStr)}
               >
                 {HOURS.map(h => (
-                  <div key={h} className="absolute w-full border-b" style={{ top: h * HOUR_HEIGHT, borderColor: 'var(--border)', opacity: 0.4 }} />
+                  <div key={h} className="absolute w-full border-b" style={{ top: h * HOUR_HEIGHT, borderColor: 'var(--border)', opacity: 0.5 }} />
                 ))}
                 {HOURS.map(h => (
-                  <div key={`${h}-30`} className="absolute w-full border-b border-dashed" style={{ top: h * HOUR_HEIGHT + HOUR_HEIGHT / 2, borderColor: 'var(--border)', opacity: 0.2 }} />
+                  <div key={`${h}-30`} className="absolute w-full border-b border-dashed" style={{ top: h * HOUR_HEIGHT + HOUR_HEIGHT / 2, borderColor: 'var(--border)', opacity: 0.25 }} />
+                ))}
+                {HOURS.map(h => (
+                  <div key={`${h}-15`} className="absolute w-full border-b border-dotted" style={{ top: h * HOUR_HEIGHT + HOUR_HEIGHT / 4, borderColor: 'var(--border)', opacity: 0.12 }} />
+                ))}
+                {HOURS.map(h => (
+                  <div key={`${h}-45`} className="absolute w-full border-b border-dotted" style={{ top: h * HOUR_HEIGHT + (HOUR_HEIGHT * 3) / 4, borderColor: 'var(--border)', opacity: 0.12 }} />
                 ))}
 
                 {dayBlocks.map(block => renderBlockItem(block))}
@@ -730,6 +749,18 @@ export default function CalendarClient({ initialEvents, userId }: { initialEvent
             value={eventForm.description}
             onChange={e => setEventForm(p => ({ ...p, description: e.target.value }))}
           />
+          {!editingEvent && (
+            <Select
+              label="Repeat"
+              value={eventForm.recurrence}
+              onChange={e => setEventForm(p => ({ ...p, recurrence: e.target.value as 'none' | 'daily' | 'weekdays' }))}
+              options={[
+                { value: 'none', label: '🔁 No repeat' },
+                { value: 'daily', label: '📅 Every day (365 days)' },
+                { value: 'weekdays', label: '💼 Every weekday Mon–Fri (365 days)' },
+              ]}
+            />
+          )}
           <div className="flex justify-end gap-2 pt-2">
             {editingEvent && (
               <Button variant="danger" onClick={() => deleteEvent(editingEvent.id)}>
