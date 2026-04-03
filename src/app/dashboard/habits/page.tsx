@@ -3,7 +3,7 @@ import HabitTracker from '@/components/habits/HabitTracker'
 import { format } from 'date-fns'
 
 export default async function HabitsPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

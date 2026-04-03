@@ -2,7 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import NotesClient from '@/components/notes/NotesClient'
 
 export default async function NotesPage() {
-  const supabase = createClient()
+
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 

@@ -3,7 +3,7 @@ import FitnessClient from '@/components/fitness/FitnessClient'
 import { format } from 'date-fns'
 
 export default async function FitnessPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
