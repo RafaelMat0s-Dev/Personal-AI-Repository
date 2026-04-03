@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Columns3, Flame, BookOpen, Dumbbell, Calendar, TrendingUp, Scale, LogOut } from 'lucide-react'
+import { LayoutDashboard, Columns3, Flame, BookOpen, Dumbbell, Calendar, TrendingUp, Scale, Settings, LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -18,6 +18,7 @@ const NAV = [
   { href: '/dashboard/calendar', icon: Calendar, label: 'Calendar' },
   { href: '/dashboard/analytics', icon: TrendingUp, label: 'Analytics' },
   { href: '/dashboard/weight', icon: Scale, label: 'Weight' },
+  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ]
 
 export default function Sidebar({ user }: { user: Profile }) {

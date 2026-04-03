@@ -15,6 +15,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/dashboard/calendar': 'Calendar',
   '/dashboard/analytics': 'Analytics',
   '/dashboard/weight': 'Weight Tracker',
+  '/dashboard/settings': 'Settings',
 }
 
 export default function TopBar({ user }: { user: Profile }) {
