@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── DARK THEME (default) ─────────────────────────── */
+:root,
+html.dark {
+  --bg: #0e0e10;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --surface3: #27272f;
+  --border: #2e2e38;
+  --text: #f0eff4;
+  --text-muted: #7e7e96;
+  --text-dim: #4a4a5c;
+  --accent: #c8fa5f;
+  --accent2: #7b6cfa;
+  --accent3: #fa6c6c;
+  --accent4: #6cf0fa;
+  --accent5: #fac86c;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+/* ─── LIGHT THEME ─────────────────────────────────── */
+html:not(.dark) {
+  --bg: #f4f4f0;
+  --surface: #ffffff;
+  --surface2: #f0efea;
+  --surface3: #e8e7e2;
+  --border: #d8d7d0;
+  --text: #111110;
+  --text-muted: #6b6b60;
+  --text-dim: #a0a096;
+  --accent: #5c8a00;
+  --accent2: #5a4dcc;
+  --accent3: #cc3030;
+  --accent4: #0088a0;
+  --accent5: #a06000;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-family: var(--font-dm-mono), 'Courier New', monospace;
+}
+
+/* ─── SCROLLBAR ────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ─── SELECTION ────────────────────────────────────── */
+::selection { background: var(--accent); color: #0e0e10; }
+
+/* ─── FOCUS ────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ─── ANIMATIONS ───────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in { animation: fadeIn 0.2s ease forwards; }
+.animate-slide-left { animation: slideInLeft 0.25s ease forwards; }
+.animate-scale-in { animation: scaleIn 0.2s ease forwards; }
+
+/* ─── SKELETON ─────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── RECHARTS ─────────────────────────────────────── */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  font-size: 11px !important;
+}
