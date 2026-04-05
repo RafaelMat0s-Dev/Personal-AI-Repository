@@ -9,16 +9,9 @@ export default async function FitnessPage() {
 
   const today = format(new Date(), 'yyyy-MM-dd')
 
-  const [
-    { data: goals },
-    { data: foodLogs },
-    { data: workoutPlans },
-    { data: workoutLogs },
-  ] = await Promise.all([
+  const [{ data: goals }, { data: foodLogs }] = await Promise.all([
     supabase.from('nutrition_goals').select('*').eq('user_id', user.id).single(),
     supabase.from('food_logs').select('*').eq('user_id', user.id).eq('date', today).order('created_at'),
-    supabase.from('workout_plans').select('*').eq('user_id', user.id).order('day_of_week').order('position'),
-    supabase.from('workout_logs').select('*').eq('user_id', user.id).gte('date', today),
   ])
 
   return (
@@ -26,8 +19,6 @@ export default async function FitnessPage() {
       userId={user.id}
       initialGoals={goals || { calories: 2000, protein: 150, carbs: 250, fat: 65 }}
       initialFoodLogs={foodLogs || []}
-      initialWorkoutPlans={workoutPlans || []}
-      initialWorkoutLogs={workoutLogs || []}
       today={today}
     />
   )
